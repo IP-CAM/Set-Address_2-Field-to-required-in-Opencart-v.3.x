@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+  <name>Field address_2 is required</name>
+  <code>oc_address_2_required</code>
+  <version>1.0</version>
+  <author>Ricardo Vigatti</author>
+  <link>https://ricardovigatti.com</link>
+
+  <file path="catalog/controller/account/address.php">
+    <operation>
+      <search><![CDATA[if (isset($this->error['address_1'])) {]]></search>
+      <add position="before"><![CDATA[
+          if (isset($this->error['address_2'])) {
+              $data['error_address_2'] = $this->error['address_2'];
+          } else {
+              $data['error_address_2'] = '';
+          }
+      ]]></add>
+    </operation>
+    <operation>
+      <search><![CDATA[if ((utf8_strlen(trim($this->request->post['address_1'])) < 3) || (utf8_strlen(trim($this->request->post['address_1'])) > 128)) {]]></search>
+      <add position="before"><![CDATA[
+          if ((utf8_strlen(trim($this->request->post['address_2'])) < 3) || (utf8_strlen(trim($this->request->post['address_2'])) > 128)) {
+              $this->error['address_2'] = $this->language->get('error_address_2');
+          }
+      ]]></add>
+    </operation>
+  </file>
+
+  <file path="catalog/view/theme/*/template/account/address_form.twig">
+    <operation>
+      <search><![CDATA[<div class="form-group">]]></search>
+      <add position="replace" index="1"><![CDATA[<div class="form-group required">]]></add>
+    </operation>
+
+    <operation>
+      <search><![CDATA[<input type="text" name="address_2" value="{{ address_2 }}" placeholder="{{ entry_address_2 }}" id="input-address-2" class="form-control" />]]></search>
+      <add position="after"><![CDATA[
+          {% if error_address_2 %}
+            <div class="text-danger">{{ error_address_2 }}</div>
+          {% endif %}
+      ]]></add>
+    </operation>
+  </file>
+
+  <file path="catalog/controller/{api,checkout}/*.php">
+    <operation>
+      <search><![CDATA[if ((utf8_strlen(trim($this->request->post['address_1'])) < 3) || (utf8_strlen(trim($this->request->post['address_1'])) > 128)) {]]></search>
+      <add position="before"><![CDATA[
+          if ((utf8_strlen(trim($this->request->post['address_2'])) < 3) || (utf8_strlen(trim($this->request->post['address_2'])) > 128)) {
+            $json['error']['address_2'] = $this->language->get('error_address_2');
+          }
+      ]]></add>
+    </operation>
+  </file>
+
+  <file path="catalog/view/theme/*/template/checkout/{guest,register}.twig">
+    <operation>
+      <search><![CDATA[<label class="control-label" for="input-payment-address-2">{{ entry_address_2 }}</label>]]></search>
+      <add position="replace" offset="-1"><![CDATA[
+        <div class="form-group required">
+          <label class="control-label" for="input-payment-address-2">{{ entry_address_2 }}</label>
+      ]]></add>
+    </operation>
+  </file>
+
+  <file path="catalog/view/theme/*/template/checkout/{guest_shipping,payment_address,shipping_address}.twig">
+    <operation>
+      <search><![CDATA[<label class="col-sm-2 control-label" for="input-payment-address-2">{{ entry_address_2 }}</label>]]></search>
+      <add position="replace" offset="-1"><![CDATA[
+        <div class="form-group required">
+          <label class="col-sm-2 control-label" for="input-payment-address-2">{{ entry_address_2 }}</label>
+      ]]></add>
+    </operation>
+  </file>
+
+  <file path="admin/controller/customer/customer.php">
+    <operation>
+      <search><![CDATA[if ((utf8_strlen($value['address_1']) < 3) || (utf8_strlen($value['address_1']) > 128)) {]]></search>
+      <add position="before"><![CDATA[
+          if ((utf8_strlen($value['address_2']) < 3) || (utf8_strlen($value['address_2']) > 128)) {
+              $this->error['address'][$key]['address_2'] = $this->language->get('error_address_2');
+          }
+      ]]></add>
+    </operation>
+  </file>
+
+  <file path="admin/view/template/customer/customer_form.twig">
+    <operation>
+      <search index="5"><![CDATA[<div class="form-group">]]></search>
+      <add position="replace"><![CDATA[
+          <div class="form-group required">
+      ]]></add>
+    </operation>
+
+    <operation>
+      <search><![CDATA[<input type="text" name="address[{{ address_row }}][address_2]" value="{{ address.address_2 }}" placeholder="{{ entry_address_2 }}" id="input-address-2{{ address_row }}" class="form-control" />]]></search>
+      <add position="after"><![CDATA[
+          {% if error_address[address_row].address_2 %}
+            <div class="text-danger">{{ error_address[address_row].address_2 }}</div>
+          {% endif %}
+      ]]></add>
+    </operation>
+
+    <operation>
+      <search index="1"><![CDATA[html += '  <div class="form-group">';]]></search>
+      <add position="replace"><![CDATA[
+          html += '  <div class="form-group required">';
+      ]]></add>
+    </operation>
+  </file>
+
+  <file path="admin/language/*/customer/customer.php">
+    <operation>
+      <search index="0"><![CDATA[$_]]></search>
+      <add position="before"><![CDATA[$_['error_address_2'] = 'O bairro deve ter entre 3 e 128 caracteres.';]]></add>
+    </operation>
+  </file>
+
+  <file path="catalog/language/*/{account/address,api/payment,api/shipping,checkout/checkout}.php">
+    <operation>
+      <search index="0"><![CDATA[$_]]></search>
+      <add position="before"><![CDATA[$_['error_address_2'] = 'O bairro deve ter entre 3 e 128 caracteres.';]]></add>
+    </operation>
+  </file>
+</modification>
